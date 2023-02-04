@@ -1,35 +1,150 @@
-% Lê o arquivo CSV
-pkg load signal
-data = dlmread("CovidNumerico.csv", ",", 1, 0); % inclui a opção "," para especificar o separador de colunas
+import os
 
-% Lê o título das colunas do arquivo
-fid = fopen("CovidNumerico.csv");
-titulos = strsplit(fgetl(fid), ","); % separa as colunas pelo separador ","
-fclose(fid);
+import matplotlib.pyplot as plt
+import pandas as pd
+import scipy.signal as ss
 
-% Pergunta ao usuário quantas vezes o filtro deve ser aplicado
-passadas = input("Quantas vezes deseja aplicar o filtro de Savitsky-Golay? ");
+# Leitura do arquivo CSV
+data = pd.read_csv(r'CovidNumerico.csv', delimiter='\t')
 
-%  A coluna que deseja filtrar - Casos novos
-coluna = 3;
+# Checando valores nulos
+data.isna().sum()
 
-% Aplicando o filtro de Savitsky-Golay
-largura = 3;
-ordem_polinomio = 1;
-if mod(largura, 2) == 0 % verifica se o tamanho do filtro é ímpar
-    largura = largura + 1; % se não for, aumenta em 1 para torná-lo ímpar
-end
-filtrado = sgolayfilt(data(:,coluna), ordem_polinomio, largura);
-for i=1:passadas-1
-    filtrado = sgolayfilt(filtrado, ordem_polinomio, largura);
-end
+# InterpolaÃ§Ã£o para excluir valores nulos
+data_int = data.interpolate()
+# Criando lista com o nome das colunas
+colunas = list(data_int.columns)
 
-% Plotagem dos dados originais e dos dados filtrados
-figure;
-plot(data(:,coluna), "b", "LineWidth", 2, "DisplayName", sprintf("Dados originais - %s", titulos{coluna}));
-hold on;
-plot(filtrado, "r", "LineWidth", 2, "DisplayName", sprintf("Dados filtrados - %s", titulos{coluna}));
-legend("show");
-xlabel("Tempo");
-ylabel("Valor");
-title(sprintf("Filtro de Savitsky-Golay aplicado %d vezes na coluna %s", passadas, titulos{coluna}));
+# AplicaÃ§Ã£o do filtro de Savitsky-Golay
+largura = 3
+ordem_polinomio = 1
+passadas = 10
+# Coluna de dados a ser suavizada
+
+while True:
+
+    print("=======BEM-VINDO AO MENU DE ESCOLHAS!========")
+    print(" ")
+    print("Selecione a opÃ§Ã£o desejada:")
+    print(" ")
+    print("OpÃ§Ã£o 0 - Sair.")
+    print("OpÃ§Ã£o 1 - CasosNovos.")
+    print("OpÃ§Ã£o 2 - ObitosNovos.")
+    print("OpÃ§Ã£o 3 - Recuperadosnovos.")
+    print("OpÃ§Ã£o 4 - EmAcompanhamentoNovos.")
+    print(" ")
+
+    opcao = input(
+        "Digite um nÃºmero que irÃ¡ definir a coluna que a ser suavizada ou 0 para sair: ")
+    if opcao == "0":
+        break
+    elif opcao in ["1"]:
+        passadas = int(
+            input("Quantas vezes voce deseja passar o filtro nos dados? "))
+        indice = 2
+        # Aplicando o filtro
+        filtrado = {}
+
+        for i in range(2, len(colunas)):
+            filtrado[colunas[i]] = ss.savgol_filter(
+                data_int[colunas[i]], largura, ordem_polinomio)
+        if passadas > 1:
+            for i in range(2, passadas):
+                for i in range(2, len(colunas)):
+                    filtrado[colunas[i]] = ss.savgol_filter(
+                        filtrado[colunas[i]], largura, ordem_polinomio)
+
+        # Plotagem dos dados originais e dos dados suavizados e escolhendo o intervalo de dados a ser filtrado
+        fig, axs = plt.subplots(1, 2)
+        fig.suptitle('Dados originais vs Dados suavizados')
+        axs[0].plot(data_int[colunas[indice]], label="Dados originais")
+        axs[0].legend()
+        axs[1].plot(filtrado[colunas[indice]], label="Dados suavizados")
+        axs[1].legend()
+        plt.show()
+
+        os.system("cls")
+
+    elif opcao in ["2"]:
+        passadas = int(
+            input("Quantas vezes voce deseja passar o filtro nos dados? "))
+        indice = 4
+        # Aplicando o filtro
+        filtrado = {}
+
+        for i in range(2, len(colunas)):
+            filtrado[colunas[i]] = ss.savgol_filter(
+                data_int[colunas[i]], largura, ordem_polinomio)
+        if passadas > 1:
+            for i in range(2, passadas):
+                for i in range(2, len(colunas)):
+                    filtrado[colunas[i]] = ss.savgol_filter(
+                        filtrado[colunas[i]], largura, ordem_polinomio)
+
+        # Plotagem dos dados originais e dos dados suavizados e escolhendo o intervalo de dados a ser filtrado
+        fig, axs = plt.subplots(1, 2)
+        fig.suptitle('Dados originais vs Dados suavizados')
+        axs[0].plot(data_int[colunas[indice]], label="Dados originais")
+        axs[0].legend()
+        axs[1].plot(filtrado[colunas[indice]], label="Dados suavizados")
+        axs[1].legend()
+        plt.show()
+
+        os.system("cls")
+
+    elif opcao in ["3"]:
+        passadas = int(
+            input("Quantas vezes voce deseja passar o filtro nos dados? "))
+        indice = 6
+        # Aplicando o filtro
+        filtrado = {}
+
+        for i in range(2, len(colunas)):
+            filtrado[colunas[i]] = ss.savgol_filter(
+                data_int[colunas[i]], largura, ordem_polinomio)
+        if passadas > 1:
+            for i in range(2, passadas):
+                for i in range(2, len(colunas)):
+                    filtrado[colunas[i]] = ss.savgol_filter(
+                        filtrado[colunas[i]], largura, ordem_polinomio)
+
+        # Plotagem dos dados originais e dos dados suavizados e escolhendo o intervalo de dados a ser filtrado
+        fig, axs = plt.subplots(1, 2)
+        fig.suptitle('Dados originais vs Dados suavizados')
+        axs[0].plot(data_int[colunas[indice]], label="Dados originais")
+        axs[0].legend()
+        axs[1].plot(filtrado[colunas[indice]], label="Dados suavizados")
+        axs[1].legend()
+        plt.show()
+
+        os.system("cls")
+
+    elif opcao in ["4"]:
+        passadas = int(
+            input("Quantas vezes voce deseja passar o filtro nos dados? "))
+        indice = 5
+        # Aplicando o filtro
+        filtrado = {}
+
+        for i in range(2, len(colunas)):
+            filtrado[colunas[i]] = ss.savgol_filter(
+                data_int[colunas[i]], largura, ordem_polinomio)
+        if passadas > 1:
+            for i in range(2, passadas):
+                for i in range(2, len(colunas)):
+                    filtrado[colunas[i]] = ss.savgol_filter(
+                        filtrado[colunas[i]], largura, ordem_polinomio)
+
+        # Plotagem dos dados originais e dos dados suavizados e escolhendo o intervalo de dados a ser filtrado
+        fig, axs = plt.subplots(1, 2)
+        fig.suptitle('Dados originais vs Dados suavizados')
+        axs[0].plot(data_int[colunas[indice]], label="Dados originais")
+        axs[0].legend()
+        axs[1].plot(filtrado[colunas[indice]], label="Dados suavizados")
+        axs[1].legend()
+        plt.show()
+
+        os.system("cls")
+
+    else:
+        break
